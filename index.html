@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Basic Kanban</title>
+  </head>
+  <body>
+    <div>
+      <input class="input_task" type="text" placeholder="Create new task" />
+      <button class="add_task">Add task</button>
+    </div>
+    <section>
+      <div class="backlog">
+        <p>Backlog</p>
+        <div class="tasks"></div>
+      </div>
+      <div class="due">
+        <p>Due task</p>
+        <div
+          class="tasks"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        ></div>
+      </div>
+      <div class="progress">
+        <p>In Progress</p>
+        <div
+          class="tasks"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        ></div>
+      </div>
+      <div class="done">
+        <p>done</p>
+        <div
+          class="tasks"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        ></div>
+      </div>
+    </section>
+  </body>
+  <script src="index.js"></script>
+</html>

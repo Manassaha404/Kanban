@@ -1,0 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+/* ─── RESET & BASE ─────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #0a0a0f;
+  --surface:   #111118;
+  --border:    #1e1e2e;
+  --glow-b:    #4f46e5;
+  --glow-p:    #7c3aed;
+  --glow-g:    #059669;
+  --glow-a:    #d97706;
+  --text:      #e2e8f0;
+  --muted:     #4a5568;
+  --accent:    #6366f1;
+  --tag-h:     28px;
+  --col-w:     280px;
+  --radius:    12px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  padding: 40px 48px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ─── GRID NOISE BACKGROUND ────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -30%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99,102,241,.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(120px, 80px) scale(1.15); }
+}
+
+/* ─── TOP BAR ───────────────────────────────────────── */
+body > div {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+body > div::before {
+  content: '⬡ KANBAN';
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .3em;
+  color: var(--accent);
+  margin-right: auto;
+  text-transform: uppercase;
+}
+
+/* ─── INPUT ─────────────────────────────────────────── */
+.input_task {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  padding: 10px 16px;
+  transition: border-color .2s, box-shadow .2s;
+  width: 300px;
+}
+
+.input_task::placeholder {
+  color: var(--muted);
+}
+
+.input_task:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.18), 0 0 20px rgba(99,102,241,.08);
+}
+
+/* ─── ADD BUTTON ────────────────────────────────────── */
+.add_task {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  padding: 10px 20px;
+  position: relative;
+  text-transform: uppercase;
+  transition: transform .15s, box-shadow .2s, background .2s;
+  overflow: hidden;
+}
+
+.add_task::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+  border-radius: inherit;
+}
+
+.add_task:hover {
+  background: #818cf8;
+  box-shadow: 0 0 24px rgba(99,102,241,.5);
+  transform: translateY(-1px);
+}
+
+.add_task:active {
+  transform: translateY(0);
+}
+
+/* ─── BOARD ─────────────────────────────────────────── */
+section {
+  
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* ─── COLUMN WRAPPERS ───────────────────────────────── */
+.backlog,
+.due,
+.progress,
+.done {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 520px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color .3s;
+  width: var(--col-w);
+}
+
+/* top accent bar per column */
+.backlog::before,
+.due::before,
+.progress::before,
+.done::before {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.backlog::before  { background: linear-gradient(90deg, #4f46e5, #7c3aed); }
+.due::before      { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.progress::before { background: linear-gradient(90deg, #7c3aed, #ec4899); }
+.done::before     { background: linear-gradient(90deg, #059669, #10b981); }
+
+/* hover glow per column */
+.backlog:hover  { border-color: rgba(79,70,229,.45);  box-shadow: 0 0 30px rgba(79,70,229,.08); }
+.due:hover      { border-color: rgba(217,119,6,.45);  box-shadow: 0 0 30px rgba(217,119,6,.08); }
+.progress:hover { border-color: rgba(124,58,237,.45); box-shadow: 0 0 30px rgba(124,58,237,.08); }
+.done:hover     { border-color: rgba(5,150,105,.45);  box-shadow: 0 0 30px rgba(5,150,105,.08); }
+
+/* ─── COLUMN HEADINGS ───────────────────────────────── */
+.backlog > p,
+.due > p,
+.progress > p,
+.done > p {
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  padding: 16px 18px 12px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* colored dot before label */
+.backlog > p::before  { content: ''; display:inline-block; width:7px; height:7px; border-radius:50%; background:#6366f1; flex-shrink:0; }
+.due > p::before      { content: ''; display:inline-block; width:7px; height:7px; border-radius:50%; background:#f59e0b; flex-shrink:0; }
+.progress > p::before { content: ''; display:inline-block; width:7px; height:7px; border-radius:50%; background:#a855f7; flex-shrink:0; }
+.done > p::before     { content: ''; display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; flex-shrink:0; box-shadow: 0 0 6px #10b981; }
+
+/* ─── TASK DROP ZONES ───────────────────────────────── */
+.tasks {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 80px;
+  transition: background .2s;
+}
+
+.tasks:empty::after {
+  content: 'drop here';
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .15em;
+  text-align: center;
+  padding-top: 32px;
+  display: block;
+  opacity: .5;
+}
+
+/* ─── TASK CARDS ────────────────────────────────────── */
+.task {
+  background: #16161f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: grab;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  position: relative;
+  transition: transform .15s, box-shadow .2s, border-color .2s;
+  user-select: none;
+  animation: cardIn .25s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.task::before {
+  content: '⠿';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  opacity: .5;
+}
+
+.task:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.2);
+  transform: translateY(-2px);
+}
+
+.task:active {
+  cursor: grabbing;
+  transform: scale(.97) rotate(.5deg);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  opacity: .85;
+}
+
+/* dragging state */
+.task[draggable="true"]:active,
+.task.dragging {
+  opacity: .6;
+  border-style: dashed;
+}
+
+/* ─── DELETE BUTTON ─────────────────────────────────── */
+.delete-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%) scale(.7);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  font-size: 14px;
+  height: 26px;
+  line-height: 1;
+  opacity: 0;
+  padding: 0;
+  place-items: center;
+  transition:
+    opacity .18s,
+    transform .18s cubic-bezier(.34,1.56,.64,1),
+    color .15s,
+    border-color .15s,
+    background .15s,
+    box-shadow .15s;
+  width: 26px;
+  z-index: 2;
+}
+
+/* icon — pure CSS × */
+.delete-btn::before,
+.delete-btn::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform .15s, background .15s;
+}
+.delete-btn::before { transform: rotate(45deg); }
+.delete-btn::after  { transform: rotate(-45deg); }
+
+/* reveal on card hover */
+.task:hover .delete-btn {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.delete-btn:hover {
+  background: rgba(239,68,68,.12);
+  border-color: rgba(239,68,68,.35);
+  box-shadow: 0 0 10px rgba(239,68,68,.2);
+  color: #ef4444;
+}
+
+.delete-btn:active {
+  transform: translateY(-50%) scale(.88);
+}
+
+/* ─── CARD TEXT — make room for the × ──────────────── */
+.task {
+  padding-right: 38px;
+}
+
+/* ─── DRAG-OVER STATE ───────────────────────────────── */
+.tasks.drag-over {
+  background: rgba(99,102,241,.06);
+  border-radius: 8px;
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 4px; }
