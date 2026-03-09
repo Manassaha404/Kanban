@@ -85,10 +85,8 @@ function loadTasksFromLocal() {
 
   const backlogTasks = tasks.filter((t) => !t.done && t.date !== today);
   backlogTasks.forEach((task) => {
-    const taskElement = document.getElementById(`task-${task.id}`);
-    if (taskElement && !backlogTaskSection.contains(taskElement)) {
-      backlogTaskSection.appendChild(taskElement);
-    }
+    let taskHTML = task.text;
+    backlogTaskSection.insertAdjacentHTML("beforeend", taskHTML);
   });
 }
 
