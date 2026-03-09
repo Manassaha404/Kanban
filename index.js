@@ -27,7 +27,7 @@ addTaskButton.addEventListener("click", () => {
   taskInput.value = "";
   tasks.push({
     id: `task-${taskId}`,
-    text: taskHTML,
+    text: taskValue,
     date: today,
     done: false,
   });
@@ -61,7 +61,7 @@ function drop(ev) {
 function deleteTask(button) {
   const parentRef = button.parentElement;
   parentRef.remove();
-  filterTasks = tasks.filter((t) => t.id !== parentRef.id);
+  tasks = tasks.filter((t) => t.id !== parentRef.id);
   saveToLocal();
 }
 
@@ -69,9 +69,11 @@ function saveToLocal() {
   let dueTasks = dueTaskSection.innerHTML;
   let progressTasks = progressTaskSection.innerHTML;
   let doneTasks = doneTaskSection.innerHTML;
+  let backlogTasks = backlogTaskSection.innerHTML;
   localStorage.setItem("due", dueTasks);
   localStorage.setItem("progress", progressTasks);
   localStorage.setItem("done", doneTasks);
+  localStorage.setItem("backlog", backlogTasks);
   localStorage.setItem("tasks_data", JSON.stringify(tasks));
 }
 
@@ -80,12 +82,13 @@ function loadTasksFromLocal() {
   progressTaskSection.innerHTML = localStorage.getItem("progress");
   doneTaskSection.innerHTML = localStorage.getItem("done");
   backlogTaskSection.innerHTML = localStorage.getItem("backlog");
-
   loadTaskData();
-
   const backlogTasks = tasks.filter((t) => !t.done && t.date !== today);
   backlogTasks.forEach((task) => {
-    let taskHTML = task.text;
+    let taskHTML = `<div class="task" id="${task.id}" draggable="true" ondragstart="drag(event)">
+        <p>${task.text}</p>
+        <button onclick="deleteTask(this)" class="delete-btn"></button>
+    </div>`;
     backlogTaskSection.insertAdjacentHTML("beforeend", taskHTML);
   });
 }
@@ -94,7 +97,7 @@ function loadTaskData() {
   const tasksData = JSON.parse(localStorage.getItem("tasks_data")) || [];
   tasks = [...tasksData];
   if (tasks.length > 0) {
-    taskId = Math.max(...tasks.map((t) => t.id));
+    taskId = Math.max(...tasks.map((t) => Number(t.id.split("-")[1])));
   }
 }
 
