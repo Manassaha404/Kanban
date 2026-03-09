@@ -13,15 +13,15 @@ let tasks = [];
 
 addTaskButton.addEventListener("click", () => {
   let taskValue = taskInput.value.trim();
-
+  if(taskValue === ""){
+    return;
+  }
   taskId++;
-
   let taskHTML = `
     <div class="task" id="task-${taskId}" draggable="true" ondragstart="drag(event)">
         <p>${taskValue}</p>
         <button onclick="deleteTask(this)" class="delete-btn"></button>
     </div>`;
-
   dueTaskSection.insertAdjacentHTML("beforeend", taskHTML);
 
   taskInput.value = "";
@@ -29,7 +29,7 @@ addTaskButton.addEventListener("click", () => {
     id: `task-${taskId}`,
     text: taskValue,
     date: today,
-    done: false,
+    status: "due",
   });
   saveToLocal();
 });
@@ -49,11 +49,32 @@ function drop(ev) {
   const task = document.getElementById(data);
 
   ev.currentTarget.appendChild(task);
-  if (ev.currentTarget === doneTaskSection) {
-    console.log(JSON.stringify(task));
 
-    let filterTasks = tasks.filter((t) => task.id !== t.id);
-    tasks = [...filterTasks];
+  if(ev.currentTarget === dueTaskSection){
+    for (let t of tasks) {
+      if(t.id === task.id){
+        t.status = "due";
+        t.date = today;
+      }
+    }
+  }
+
+  if(ev.currentTarget === progressTaskSection){
+    for (let t of tasks) {
+      if(t.id === task.id){
+        t.status = "progress";
+        t.date = today;
+      }
+    }
+  }
+
+  if(ev.currentTarget === doneTaskSection){
+    for (let t of tasks) {
+      if(t.id === task.id){
+        t.status = "done";
+        t.date = today;
+      }
+    }
   }
   saveToLocal();
 }
@@ -66,30 +87,36 @@ function deleteTask(button) {
 }
 
 function saveToLocal() {
-  let dueTasks = dueTaskSection.innerHTML;
-  let progressTasks = progressTaskSection.innerHTML;
-  let doneTasks = doneTaskSection.innerHTML;
-  let backlogTasks = backlogTaskSection.innerHTML;
-  localStorage.setItem("due", dueTasks);
-  localStorage.setItem("progress", progressTasks);
-  localStorage.setItem("done", doneTasks);
-  localStorage.setItem("backlog", backlogTasks);
   localStorage.setItem("tasks_data", JSON.stringify(tasks));
 }
 
 function loadTasksFromLocal() {
-  dueTaskSection.innerHTML = localStorage.getItem("due");
-  progressTaskSection.innerHTML = localStorage.getItem("progress");
-  doneTaskSection.innerHTML = localStorage.getItem("done");
-  backlogTaskSection.innerHTML = localStorage.getItem("backlog");
   loadTaskData();
-  const backlogTasks = tasks.filter((t) => !t.done && t.date !== today);
-  backlogTasks.forEach((task) => {
-    let taskHTML = `<div class="task" id="${task.id}" draggable="true" ondragstart="drag(event)">
+  console.log(tasks);
+  
+  tasks.forEach((task) => {
+
+    let taskHTML = `
+    <div class="task" id="${task.id}" draggable="true" ondragstart="drag(event)">
         <p>${task.text}</p>
         <button onclick="deleteTask(this)" class="delete-btn"></button>
     </div>`;
-    backlogTaskSection.insertAdjacentHTML("beforeend", taskHTML);
+
+    if (task.status !== "done" && task.date !== today) {
+      backlogTaskSection.insertAdjacentHTML("beforeend", taskHTML);
+    }
+
+    else if (task.status === "due") {
+      dueTaskSection.insertAdjacentHTML("beforeend", taskHTML);
+    }
+
+    else if (task.status === "progress") {
+      progressTaskSection.insertAdjacentHTML("beforeend", taskHTML);
+    }
+
+    else if (task.status === "done") {
+      doneTaskSection.insertAdjacentHTML("beforeend", taskHTML);
+    }
   });
 }
 
